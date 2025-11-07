@@ -1,0 +1,20 @@
+{
+  "name": "vibematrix",
+  "version": "1.0.0",
+  "description": "💫 VibeMatrix — The futuristic mood tracker for developers, straight in your terminal.",
+  "main": "bin/vibematrix.js",
+  "bin": {
+    "vibematrix": "bin/vibematrix.js"
+  },
+  "type": "module",
+  "author": "VMayank Vyas",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "inquirer": "^9.3.8"
+  },
+  "scripts": {
+    "start": "node bin/vibematrix.js"
+  },
+  "keywords": ["cli", "mood", "vibes", "matrix", "developer", "fun"]
+}
