@@ -4,7 +4,8 @@
   "description": "💫 VibeMatrix — The futuristic mood tracker for developers, straight in your terminal.",
   "main": "bin/vibematrix.js",
   "bin": {
-    "vibematrix": "bin/vibematrix.js"
+    "vibematrix": "bin/vibematrix.js",
+    "vm": "bin/vibematrix.js"
   },
   "type": "module",
   "author": "VMayank Vyas",

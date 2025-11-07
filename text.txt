@@ -1,0 +1,196 @@
+# 😎 VibeMatrix
+
+![npm](https://img.shields.io/npm/v/vibematrix?style=for-the-badge&logo=npm&color=ff69b4)
+![License](https://img.shields.io/badge/License-MIT-blueviolet?style=for-the-badge)
+![Node](https://img.shields.io/badge/Node.js-%3E%3D18-brightgreen?style=for-the-badge)
+![Downloads](https://img.shields.io/npm/dt/vibematrix?style=for-the-badge&color=orange)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+![Made With](https://img.shields.io/badge/Made%20With-☕%20Coffee%20%26%20Vibes-brown?style=for-the-badge)
+
+
+A fun and lightweight **CLI tool** that lets you **track and visualize your moods** right from the terminal — complete with emoji bar charts!
+Perfect for developers who want to track how they feel during coding sessions.
+
+---
+
+## 🚀 Features
+
+* Log your daily mood easily from the command line
+* View all past moods
+* Display a **mini bar chart** showing mood frequency using emojis
+* Simple and persistent local JSON storage
+* Works anywhere in your terminal
+
+---
+
+## 📦 Installation
+
+### 1. Clone or download the repository
+
+```bash
+git clone https://github.com/yourusername/VibeMatrix.git
+cd VibeMatrix
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Link globally (for CLI use)
+
+This lets you use the command `VibeMatrix` anywhere.
+
+```bash
+npm link
+```
+
+> ⚠️ **If you see an error like:**
+> `'node.exe' is not recognized as the name of a cmdlet...`
+> it means Node.js isn’t detected in VS Code’s terminal.
+> See the **Troubleshooting** section below.
+
+---
+
+## 🧠 Usage
+
+### ➕ Log a new mood
+
+```bash
+VibeMatrix add
+```
+
+You’ll be asked to select or type your current mood:
+
+```
+How are you feeling today?
+😎 Happy
+😂 Excited
+😴 Tired
+😭 Sad
+🤯 Stressed
+```
+
+### 📊 View all mood stats
+
+```bash
+VibeMatrix stats
+```
+
+Example output:
+
+```
+Your Mood Summary:
+
+😎 ▓▓▓▓▓▓ (5)
+😂 ▓▓▓ (3)
+😴 ▓ (1)
+
+Total moods logged: 9
+```
+
+### 🗑️ Reset all logs
+
+```bash
+VibeMatrix reset
+```
+
+Deletes all stored data from your local `.mood-logs.json`.
+
+---
+
+## 🧩 How It Works
+
+* Moods are saved in a small local JSON file (like `.mood-logs.json`) in your home directory.
+* Each time you add a mood, it increments the count.
+* When you view stats, a small ASCII/emoji bar chart is generated using simple characters or blocks (like ▓ or ░).
+
+---
+
+## 🛠️ Developer Notes
+
+### Local Development
+
+To test changes:
+
+```bash
+node index.js add
+node index.js stats
+```
+
+After making updates:
+
+```bash
+npm unlink -g VibeMatrix
+npm link
+```
+
+### Uninstall
+
+```bash
+npm unlink -g VibeMatrix
+```
+
+---
+
+## 🧰 Troubleshooting
+
+### ❌ Node not recognized in VS Code terminal
+
+If `npm link` or `node` shows an error like:
+
+```
+The term 'node.exe' is not recognized...
+```
+
+Try these fixes:
+
+1. Check Node in Command Prompt:
+
+   ```bash
+   node -v
+   ```
+
+   If it works there, the issue is with VS Code.
+
+2. **Restart VS Code** completely.
+   It may not have loaded your PATH variable yet.
+
+3. **Add Node.js to your PATH** manually:
+
+   * Open “Environment Variables”
+   * Edit the `Path` under System variables
+   * Add:
+
+     ```
+     C:\Program Files\nodejs\
+     ```
+   * Restart your system.
+
+4. In VS Code, switch terminal to **Command Prompt**:
+
+   * Click the arrow (˅) in terminal tab
+   * Choose “Select Default Profile” → “Command Prompt”
+   * Open new terminal.
+
+---
+
+## 🧡 Example Output
+
+```
+😎 ▓▓▓▓▓▓ (5)
+😂 ▓▓▓ (3)
+😴 ▓ (1)
+
+Keep smiling! 😎
+```
+
+---
+
+## 🧑‍💻 Author
+
+**Vijay Kakra Dadhich**
+Full Stack Developer | 3D Web Designer | Cloud Architect
+📧 [nikhils8771@gma
