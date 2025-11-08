@@ -16,7 +16,6 @@ import {
   saveSchedule,
   clearSchedule,
   getHistory,
-   getWeeklyEnergyTrend,
 } from "../lib/storage.js";
 
 // 💫 ASCII Banner
@@ -113,8 +112,7 @@ async function loopMood(timeArg = "1m") {
 function showDashboard() {
   showBanner();
   const stats = getDashboardData();
-  if (!stats || !stats.data || !stats.data.length)
-    return console.log(red("No mood data found. Start logging first!"));
+  if (!stats) return console.log(red("No mood data found. Start logging first!"));
 
   const [moodName, moodCount] = stats.mostUsed;
   const energy = parseFloat(stats.avgEnergy);
@@ -123,7 +121,6 @@ function showDashboard() {
   const empty = "·".repeat(10 - Math.round(energy));
   const bar = color(`${filled}${empty}`);
 
-  // === Main Dashboard Section ===
   console.log(cyan("\n💫 VibeMatrix Dashboard"));
   console.log(gray("───────────────────────────────"));
   console.log(green(`📅 Total Logs: ${stats.total}`));
@@ -131,44 +128,23 @@ function showDashboard() {
   console.log(blue(`😎 Most Frequent Mood: ${moodName} (${moodCount})`));
   console.log(magenta(`⚡ Average Energy: ${energy}/10`));
   console.log(color(`🔋 Energy Meter: ${bar}`));
-  console.log(
-    cyan(
-      `🧘 Last Mood: ${stats.last.emoji} ${stats.last.name} (${new Date(
-        stats.last.date
-      ).toLocaleString()})`
-    )
-  );
+  console.log(cyan(`🧘 Last Mood: ${stats.last.emoji} ${stats.last.name} (${new Date(stats.last.date).toLocaleString()})`));
+  console.log(gray("───────────────────────────────"));
+  showEnergyTrend();
   console.log(gray("───────────────────────────────\n"));
 
-  // === Energy Trend (New Section) ===
-  
-  showEnergyTrend(); // 👈 add this here to actually render below dashboard
-
-
-  // === Weekly Energy Trend (New Section) ===
-showWeeklyEnergyTrend(); // 👈 add this here
-
-  // === Motivational Message ===
-  if (energy >= 8)
-    console.log(green("🌟 You’re on fire today! Keep up the amazing energy!"));
-  else if (energy >= 5)
-    console.log(yellow("💪 You’re doing great — stay consistent!"));
+  if (energy >= 8) console.log(green("🌟 You’re on fire today! Keep up the amazing energy!"));
+  else if (energy >= 5) console.log(yellow("💪 You’re doing great — stay consistent!"));
   else console.log(red("🧘 Take a short break. You’ve earned it."));
-  
 }
 
 // === Energy Trend Graph (Dashboard 2.0) ===
 function showEnergyTrend() {
-  const data = getHistory(10); // ✅ now fetch recent moods directly
-  if (!data || !data.length) return;
+  const stats = getDashboardData();
+  if (!stats || !stats.data) return;
 
-  const energyMap = {
-    "😎": 9,
-    "🤖": 8,
-    "😂": 7,
-    "😴": 4,
-    "😡": 3,
-  };
+  const data = stats.data.slice(-10);
+  const energyMap = { "😎": 9, "🤖": 8, "😂": 7, "😴": 4, "😡": 3 };
 
   console.log(cyan("\n⚡ Energy Trend (Last 10 Moods)"));
   console.log(gray("──────────────────────────────"));
@@ -176,14 +152,10 @@ function showEnergyTrend() {
   data.forEach((m) => {
     const energy = energyMap[m.emoji] || 5;
     const filled = "⚡".repeat(Math.round(energy / 2));
-    const energyColor =
-      energy >= 8 ? green : energy >= 5 ? yellow : red;
-
-    console.log(`${m.emoji} ${m.name.padEnd(18)} ${energyColor(filled)}`);
+    console.log(`${m.emoji} ${m.name.padEnd(18)} ${green(filled)}`);
   });
-
-  console.log(gray("──────────────────────────────\n"));
 }
+
 // === Streak Tracker ===
 function showStreak() {
   showBanner();
@@ -258,56 +230,7 @@ async function moodOfTheDay() {
   console.log(gray("────────────────────────────"));
   console.log(blue("✨ Take this energy into your day! 💫\n"));
 }
-// === AUTO MOOD PREDICTION (AI STYLE) ===
-function predictMoodFromText(text) {
-  const lower = text.toLowerCase();
-
-  const map = [
-    { keywords: ["fix", "refactor", "clean", "update"], mood: "🤖 Focused" },
-    { keywords: ["add", "create", "launch", "feature"], mood: "😎 Productive" },
-    { keywords: ["bug", "issue", "fail", "error"], mood: "😡 Frustrated" },
-    { keywords: ["fun", "cool", "awesome", "nice"], mood: "😂 Cheerful" },
-    { keywords: ["tired", "sleep", "zzz", "break"], mood: "😴 Tired" },
-  ];
-
-  for (const { keywords, mood } of map) {
-    if (keywords.some((word) => lower.includes(word))) {
-      return moods.find((m) => m.name.includes(mood)) || moods[0];
-    }
-  }
-
-  // Default fallback
-  return moods.find((m) => m.name.includes("Focused")) || moods[0];
-}
-
-async function autoMoodPrediction() {
-  showBanner();
-  let commitMsg = "";
-
-  try {
-    commitMsg = execSync("git log -1 --pretty=%B").toString().trim();
-    console.log(gray(`\n🧠 Analyzing your last commit: "${commitMsg}"...`));
-  } catch {
-    const { message } = await inquirer.prompt([
-      {
-        type: "input",
-        name: "message",
-        message: cyan("💬 No Git repo found. Type something you’ve done today:"),
-      },
-    ]);
-    commitMsg = message;
-  }
-
-  const predictedMood = predictMoodFromText(commitMsg);
-  saveMood(predictedMood);
-
-  console.log(green(`\n${predictedMood.emoji} AI thinks you're feeling: ${predictedMood.name.split(" ")[1]}`));
-  console.log(yellow(predictedMood.message));
-  console.log(blue("💡 Mood auto-logged based on your activity!\n"));
-}
-
-
-// === Custom Scheduler ===
+// === Custom Scheduler (Auto Reminders) ===
 async function scheduleMood(timeArg = "daily 9am") {
   showBanner();
 
@@ -324,6 +247,7 @@ async function scheduleMood(timeArg = "daily 9am") {
   console.log(cyan(`You’ll be reminded to log your mood ${type} at ${time}.`));
   console.log(gray("──────────────────────────────"));
 
+  // Convert type → interval
   const interval =
     type === "hourly" ? 3600000 :
     type === "daily" ? 86400000 :
@@ -335,27 +259,38 @@ async function scheduleMood(timeArg = "daily 9am") {
     await logMood();
   }
 }
-// === WEEKLY ENERGY CHART ===
-function showWeeklyEnergyTrend() {
-  const trend = getWeeklyEnergyTrend();
-  if (!trend.length) return console.log(red("No energy data yet. Log moods first!"));
 
-  console.log(cyan("\n⚡ Weekly Energy Trend"));
-  console.log(gray("──────────────────────────────"));
+// debug-vm.js
+import path from "path";
+import os from "os";
+import fs from "fs";
 
-  trend.forEach(({ date, avg }) => {
-    const barLength = Math.round((avg / 10) * 20); // 20-character bar
-    const bar = "█".repeat(barLength).padEnd(20, "░");
-    const color = avg >= 8 ? green : avg >= 5 ? yellow : red;
+const root = process.cwd();
+console.log("cwd:", root);
+console.log("node:", process.version);
 
-    const day = new Date(date).toLocaleDateString("en-US", { weekday: "short" });
-    console.log(`${day.padEnd(4)} ${color(bar)} ${gray(avg.toFixed(1))}`);
-  });
+const storagePath = path.join(os.homedir(), ".vibematrix.json");
+console.log("expected storage:", storagePath);
+console.log("storage exists:", fs.existsSync(storagePath));
 
-  console.log(gray("──────────────────────────────\n"));
+try {
+  const st = await import(path.join(root, "lib", "storage.js"));
+  console.log("storage exports:", Object.keys(st));
+  if (st.getDashboardData) {
+    const d = st.getDashboardData();
+    console.log("getDashboardData() =>", d ? { total: d.total, streak: d.streak } : "null");
+  }
+} catch (err) {
+  console.error("storage import err:", err.stack || err.message || err);
 }
 
-
+try {
+  const st2 = await import(path.join(root, "lib", "st.js"));
+  console.log("st.js exports:", Object.keys(st2));
+  if (st2.getMoodStats) console.log("getMoodStats() =>", st2.getMoodStats());
+} catch (err) {
+  console.error("st.js import err:", err.stack || err.message || err);
+}
 
 // === Command Router ===
 const args = process.argv.slice(2);
@@ -371,13 +306,9 @@ const commands = {
   loop: loopMood,
   schedule: scheduleMood,
   mood: moodOfTheDay,
-  auto: autoMoodPrediction,
   help: () => {
     showBanner();
-    // console.log(yellow("\n⚙️  Commands: stats | dashboard | streak | history | remind | loop | git | schedule | mood | help"));
-    console.log(yellow("\n⚙️  Commands: stats | dashboard | streak | history | remind | loop | git | schedule | mood | auto | help"))
-
-
+    console.log(yellow("\n⚙️  Commands: stats | dashboard | streak | history | remind | loop | git | schedule | mood | help"));
     console.log(gray("────────────────────────────────────────────"));
     console.log(blue("💡 Tip: Run 'vibematrix' with no args to log your mood.\n"));
   },
