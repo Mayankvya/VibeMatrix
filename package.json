@@ -10,6 +10,14 @@
   "type": "module",
   "author": "VMayank Vyas",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mayankvya/VibeMatrix.git"
+  },
+  "homepage": "https://github.com/Mayankvya/VibeMatrix#readme",
+  "bugs": {
+    "url": "https://github.com/Mayankvya/VibeMatrix/issues"
+  },
   "dependencies": {
     "chalk": "^5.3.0",
     "colorette": "^2.0.20",

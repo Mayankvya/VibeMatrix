@@ -1,0 +1,36 @@
+name: Publish to GitHub Packages
+
+# Publishes a scoped copy (@mayankvya/vibematrix) to GitHub Packages so it
+# appears under github.com/Mayankvya?tab=packages. The npm copy (vibematrix)
+# is unaffected — this only touches the package name inside the CI run.
+#
+# Trigger it manually from the Actions tab ("Run workflow"), or it runs
+# automatically whenever you publish a GitHub Release.
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+          scope: '@mayankvya'
+
+      - name: Scope the package name for GitHub Packages
+        run: npm pkg set name=@mayankvya/vibematrix
+
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
